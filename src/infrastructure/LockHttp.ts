@@ -34,7 +34,7 @@ import {UInt64} from '../model/UInt64';
  *
  */
 
-export class LockRepository extends Http {
+export class LockHttp extends Http {
     /**
      * @internal
      * Nem2 Library lock routes api
@@ -94,20 +94,20 @@ export class LockRepository extends Http {
      * Gets array of LockFundsInfo for an account
      * @param address - Address
      * @param queryParams - (Optional) Query params
-     * @returns Observable<SecretLockInfo[]>
+     * @returns Observable<LockFundsInfo[]>
      */
-    getLockFundssInfoFromAccount(address: Address,
-                                 queryParams?: QueryParams): Observable<LockFundsInfo[]> {
+    getLockFundsInfoFromAccount(address: Address,
+                                queryParams?: QueryParams): Observable<LockFundsInfo[]> {
         return this.getNetworkTypeObservable()
             .flatMap((networkType) => Observable.fromPromise(
                 this.lockRoutesApi.getLockFundsInfoFromAccount(address.plain(), queryParams != null ? queryParams : {}))
-                .map((LockFundssInfoDTO) => {
-                return LockFundssInfoDTO.map((LockFundsInfoDTO) => new LockFundsInfo(
-                    PublicAccount.createFromPublicKey(LockFundsInfoDTO.account, networkType),
-                    new Mosaic(new MosaicId(LockFundsInfoDTO.mosaicId), new UInt64(LockFundsInfoDTO.amount)),
-                    new UInt64(LockFundsInfoDTO.height),
-                    LockFundsInfoDTO.status,
-                    LockFundsInfoDTO.hash));
+                .map((lockFundsInfosDTO) => {
+                return lockFundsInfosDTO.map((lockFundsInfoDTO) => new LockFundsInfo(
+                    PublicAccount.createFromPublicKey(lockFundsInfoDTO.account, networkType),
+                    new Mosaic(new MosaicId(lockFundsInfoDTO.mosaicId), new UInt64(lockFundsInfoDTO.amount)),
+                    new UInt64(lockFundsInfoDTO.height),
+                    lockFundsInfoDTO.status,
+                    lockFundsInfoDTO.hash));
             }));
     }
 
@@ -130,7 +130,7 @@ export class LockRepository extends Http {
                         secretLockInfoDTO.status,
                         secretLockInfoDTO.hashType,
                         secretLockInfoDTO.secret,
-                        Address.createFromEncoded(secretLockInfoDTO.recipient));
+                        Address.createFromEncoded(secretLockInfoDTO.recipient)))
                 }));
     }
 }

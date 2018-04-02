@@ -27,7 +27,7 @@ export class SecretLockInfo {
                 public readonly mosaic: Mosaic,
                 public readonly expirationHeight: UInt64,
                 public readonly status: LockStatus,
-                public readonly hashAlgorithm: HashType,
+                public readonly hashType: HashType,
                 public readonly secret: string,
                 public readonly recipient: Address) {
 

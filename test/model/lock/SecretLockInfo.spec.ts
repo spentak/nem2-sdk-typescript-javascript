@@ -59,7 +59,7 @@ describe('SecretLockInfo', () => {
         deepEqual(secretLockInfo.mosaic, new Mosaic(secretLockInfoDTO.lock.mosaicId, secretLockInfoDTO.lock.amount));
         deepEqual(secretLockInfo.expirationHeight, secretLockInfoDTO.lock.height);
         expect(secretLockInfo.status).to.be.equal(secretLockInfoDTO.lock.status);
-        expect(secretLockInfo.hashAlgorithm).to.be.equal(secretLockInfoDTO.lock.hashAlgorithm);
+        expect(secretLockInfo.hashType).to.be.equal(secretLockInfoDTO.lock.hashAlgorithm);
         expect(secretLockInfo.secret).to.be.equal(secretLockInfoDTO.lock.secret);
         deepEqual(secretLockInfo.recipient, secretLockInfoDTO.lock.recipient);
     });

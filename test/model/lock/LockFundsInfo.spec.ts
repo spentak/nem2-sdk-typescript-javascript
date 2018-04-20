@@ -35,6 +35,9 @@ describe('LockFundsInfo', () => {
             hash: 'B694186EE4AB0558CA4AFCFDD43B42114AE71094F5A1FC4A913FE9971CACD' +
             '21DB694186EE4AB0558CA4AFCFDD43B42114AE71094F5A1FC4A913FE9971CACD21D',
         },
+        meta: {
+            id: '5ad9c23ca17289a20d88ca6a',
+        },
     };
 
     before(() => {
@@ -48,6 +51,7 @@ describe('LockFundsInfo', () => {
             lockFundsInfoDTO.lock.height,
             lockFundsInfoDTO.lock.status,
             lockFundsInfoDTO.lock.hash,
+            lockFundsInfoDTO.meta.id,
         );
 
         deepEqual(lockFundsInfo.account, lockFundsInfoDTO.lock.account);
@@ -55,6 +59,8 @@ describe('LockFundsInfo', () => {
         deepEqual(lockFundsInfo.expirationHeight, lockFundsInfoDTO.lock.height);
         expect(lockFundsInfo.status).to.be.equal(lockFundsInfoDTO.lock.status);
         expect(lockFundsInfo.hash).to.be.equal(lockFundsInfoDTO.lock.hash);
+        expect(lockFundsInfo.metaId).to.be.equal(lockFundsInfoDTO.meta.id);
+
     });
 
 });

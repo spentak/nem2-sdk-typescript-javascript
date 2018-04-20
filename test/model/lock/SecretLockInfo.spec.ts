@@ -38,6 +38,9 @@ describe('SecretLockInfo', () => {
             '21DB694186EE4AB0558CA4AFCFDD43B42114AE71094F5A1FC4A913FE9971CACD21D',
             recipient: Address.createFromRawAddress('SCTVW23D2MN5VE4AQ4TZIDZENGNOZXPRPRLIKCF2'),
         },
+        meta: {
+            id: '5ad9c23ca17289a20d88ca6a',
+        },
     };
 
     before(() => {
@@ -53,6 +56,7 @@ describe('SecretLockInfo', () => {
             secretLockInfoDTO.lock.hashAlgorithm,
             secretLockInfoDTO.lock.secret,
             secretLockInfoDTO.lock.recipient,
+            secretLockInfoDTO.meta.id,
         );
 
         deepEqual(secretLockInfo.account, secretLockInfoDTO.lock.account);
@@ -62,6 +66,7 @@ describe('SecretLockInfo', () => {
         expect(secretLockInfo.hashType).to.be.equal(secretLockInfoDTO.lock.hashAlgorithm);
         expect(secretLockInfo.secret).to.be.equal(secretLockInfoDTO.lock.secret);
         deepEqual(secretLockInfo.recipient, secretLockInfoDTO.lock.recipient);
+        expect(secretLockInfo.metaId).to.be.equal(secretLockInfoDTO.meta.id);
     });
 
 });

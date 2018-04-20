@@ -25,7 +25,8 @@ export class LockFundsInfo {
                 public readonly mosaic: Mosaic,
                 public readonly expirationHeight: UInt64,
                 public readonly status: LockStatus,
-                public readonly hash: string) {
+                public readonly hash: string,
+                public readonly metaId: string) {
 
     }
 }

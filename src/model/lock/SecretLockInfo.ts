@@ -29,7 +29,8 @@ export class SecretLockInfo {
                 public readonly status: LockStatus,
                 public readonly hashType: HashType,
                 public readonly secret: string,
-                public readonly recipient: Address) {
+                public readonly recipient: Address,
+                public readonly metaId: string) {
 
     }
 }

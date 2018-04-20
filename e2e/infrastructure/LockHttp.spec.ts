@@ -16,19 +16,23 @@
 import {expect} from 'chai';
 import {LockHttp} from '../../src/infrastructure/LockHttp';
 import {Address} from '../../src/model/account/Address';
+import {PublicAccount} from '../../src/model/account/PublicAccount';
+import {NetworkType} from '../../src/model/blockchain/NetworkType';
 import {XEM} from '../../src/model/mosaic/XEM';
+import {UInt64} from '../../src/model/UInt64';
 import {APIUrl} from '../conf/conf.spec';
 
 describe('LockHttp', () => {
     const lockHttp = new LockHttp(APIUrl);
-    const accountAddress = Address.createFromRawAddress('SDRDGFTDLLCB67D4HPGIMIHPNSRYRJRT7DOBGWZY');
+    const publicAccount = PublicAccount.createFromPublicKey('C2F93346E27CE6AD1A9F8F5E3066F83' +
+        '26593A406BDF357ACB041E2F9AB402EFE', NetworkType.MIJIN_TEST);
 
     describe('getLockFunds', () => {
         it('should call getLockFunds successfully', (done) => {
-            lockHttp.getLockFunds('ADF6E45D8C21BC3B835A2C3ABAC90800A270601F0B1361BC46C26E00968105E6')
+            lockHttp.getLockFunds('9253B3165DF4D4FC0CE831F104BFCFDDAF50A6E36D1BAD35F234AFA0F32B29D6')
                 .subscribe((lockFundsInfo) => {
-                    expect(lockFundsInfo.account.address).to.be.equal(accountAddress);
-                    expect(lockFundsInfo.mosaic).to.be.equal(XEM.createAbsolute(10));
+                    expect(lockFundsInfo.account.address.plain()).to.be.equal(publicAccount.address.plain());
+                    expect(lockFundsInfo.mosaic.id.toHex()).to.be.equal(XEM.MOSAIC_ID.toHex());
                     done();
                 });
         });
@@ -36,28 +40,28 @@ describe('LockHttp', () => {
 
     describe('getSecretLock', () => {
         it('should call getSecretLock successfully', (done) => lockHttp
-            .getSecretLock('E70D37DA074D5F2CEF6BCE7E3E06D3D7E42E5A653EDDE49EDEB0628C295883' +
-                'CE6685494FE64B835762BB2D5959AE48F87501E7DB3B826B4C1BA9D3BA70BC5DC5').subscribe((secretLockInfo) => {
-                expect(secretLockInfo.account.address).to.be.equal(accountAddress);
-                expect(secretLockInfo.mosaic).to.be.equal(XEM.createAbsolute(10));
+            .getSecretLock('F60CEC9733B94BE27751A54AE91E63FE20B977ADE0064265D225220D460F' +
+                'F1137149D27F81430CB59CB0EEAE87A476D7262F3FA36606C1BD3E91EFCF187FEE89').subscribe((secretLockInfo) => {
+                expect(secretLockInfo.account.address.plain()).to.be.equal(publicAccount.address.plain());
+                expect(secretLockInfo.mosaic.id.toHex()).to.be.equal(XEM.MOSAIC_ID.toHex());
                 done();
             }));
     });
 
     describe('getLockFundsInfoFromAccount', () => {
         it('should call getLockFundsInfoFromAccount successfully', (done) => lockHttp
-            .getLockFundsInfoFromAccount(accountAddress).subscribe((lockFundsInfo) => {
-                expect(lockFundsInfo[0].account.address).to.be.equal(accountAddress);
-                expect(lockFundsInfo[0].mosaic).to.be.equal(XEM.createAbsolute(10));
+            .getLockFundsInfoFromAccount(publicAccount.address).subscribe((lockFundsInfo) => {
+                expect(lockFundsInfo[0].account.address.plain()).to.be.equal(publicAccount.address.plain());
+                expect(lockFundsInfo[0].mosaic.id.toHex()).to.be.equal(XEM.MOSAIC_ID.toHex());
                 done();
             }));
     });
 
     describe('getSecretLocksInfoFromAccount', () => {
         it('should call getSecretLocksInfoFromAccount successfully', (done) => lockHttp
-            .getSecretLocksInfoFromAccount(accountAddress).subscribe((secretLocksInfo) => {
-                expect(secretLocksInfo[0].account.address).to.be.equal(accountAddress);
-                expect(secretLocksInfo[0].mosaic).to.be.equal(XEM.createAbsolute(10));
+            .getSecretLocksInfoFromAccount(publicAccount.address).subscribe((secretLocksInfo) => {
+                expect(secretLocksInfo[0].account.address.plain()).to.be.equal(publicAccount.address.plain());
+                expect(secretLocksInfo[0].mosaic.id.toHex()).to.be.equal(XEM.MOSAIC_ID.toHex());
                 done();
         }));
     });

@@ -14,18 +14,22 @@
  * limitations under the License.
  */
 
+import {LockRoutesApi} from 'nem2-library';
+import 'rxjs/add/observable/fromPromise';
+import 'rxjs/add/operator/map';
+import 'rxjs/add/operator/mergeMap';
 import {Observable} from 'rxjs/Observable';
 import {Address} from '../model/account/Address';
-import {SecretLockInfo} from '../model/lock/SecretLockInfo';
-import {QueryParams} from './QueryParams';
-import {LockFundsInfo} from '../model/lock/LockFundsInfo';
-import {LockRoutesApi} from 'nem2-library';
-import {NetworkHttp} from './NetworkHttp';
-import {Http} from './Http';
 import {PublicAccount} from '../model/account/PublicAccount';
+import {LockFundsInfo} from '../model/lock/LockFundsInfo';
+import {SecretLockInfo} from '../model/lock/SecretLockInfo';
 import {Mosaic} from '../model/mosaic/Mosaic';
 import {MosaicId} from '../model/mosaic/MosaicId';
 import {UInt64} from '../model/UInt64';
+import {Http} from './Http';
+import {LockRepository} from './LockRepository';
+import {NetworkHttp} from './NetworkHttp';
+import {QueryParams} from './QueryParams';
 
 /**
  * Lock http repository.
@@ -34,7 +38,7 @@ import {UInt64} from '../model/UInt64';
  *
  */
 
-export class LockHttp extends Http {
+export class LockHttp extends Http implements LockRepository {
     /**
      * @internal
      * Nem2 Library lock routes api
@@ -60,13 +64,14 @@ export class LockHttp extends Http {
     getLockFunds(hash: string): Observable<LockFundsInfo> {
         return this.getNetworkTypeObservable()
             .flatMap((networkType) => Observable.fromPromise(
-            this.lockRoutesApi.getLockFunds(hash)).map((LockFundsInfoDTO) => {
-           return new LockFundsInfo(
-               PublicAccount.createFromPublicKey(LockFundsInfoDTO.account, networkType),
-               new Mosaic(new MosaicId(LockFundsInfoDTO.mosaicId), new UInt64(LockFundsInfoDTO.amount)),
-               new UInt64(LockFundsInfoDTO.height),
-               LockFundsInfoDTO.status,
-               LockFundsInfoDTO.hash);
+            this.lockRoutesApi.getLockFunds(hash)).map((lockFundsInfoDTO) => {
+            return new LockFundsInfo(
+                PublicAccount.createFromPublicKey(lockFundsInfoDTO.lock.account, networkType),
+                new Mosaic(new MosaicId(lockFundsInfoDTO.lock.mosaicId), new UInt64(lockFundsInfoDTO.lock.amount)),
+                new UInt64(lockFundsInfoDTO.lock.height),
+                lockFundsInfoDTO.lock.status,
+                lockFundsInfoDTO.lock.hash,
+                lockFundsInfoDTO.meta.id);
         }));
     }
 
@@ -80,13 +85,14 @@ export class LockHttp extends Http {
             .flatMap((networkType) => Observable.fromPromise(
                 this.lockRoutesApi.getSecretLock(secret)).map((secretLockInfoDTO) => {
                 return new SecretLockInfo(
-                    PublicAccount.createFromPublicKey(secretLockInfoDTO.account, networkType),
-                    new Mosaic(new MosaicId(secretLockInfoDTO.mosaicId), new UInt64(secretLockInfoDTO.amount)),
-                    new UInt64(secretLockInfoDTO.height),
-                    secretLockInfoDTO.status,
-                    secretLockInfoDTO.hashType,
-                    secretLockInfoDTO.secret,
-                    Address.createFromEncoded(secretLockInfoDTO.recipient));
+                    PublicAccount.createFromPublicKey(secretLockInfoDTO.lock.account, networkType),
+                    new Mosaic(new MosaicId(secretLockInfoDTO.lock.mosaicId), new UInt64(secretLockInfoDTO.lock.amount)),
+                    new UInt64(secretLockInfoDTO.lock.height),
+                    secretLockInfoDTO.lock.status,
+                    secretLockInfoDTO.lock.hashAlgorithm,
+                    secretLockInfoDTO.lock.secret,
+                    Address.createFromEncoded(secretLockInfoDTO.lock.recipient),
+                    secretLockInfoDTO.meta.id);
             }));
     }
 
@@ -103,11 +109,12 @@ export class LockHttp extends Http {
                 this.lockRoutesApi.getLockFundsInfoFromAccount(address.plain(), queryParams != null ? queryParams : {}))
                 .map((lockFundsInfosDTO) => {
                 return lockFundsInfosDTO.map((lockFundsInfoDTO) => new LockFundsInfo(
-                    PublicAccount.createFromPublicKey(lockFundsInfoDTO.account, networkType),
-                    new Mosaic(new MosaicId(lockFundsInfoDTO.mosaicId), new UInt64(lockFundsInfoDTO.amount)),
-                    new UInt64(lockFundsInfoDTO.height),
-                    lockFundsInfoDTO.status,
-                    lockFundsInfoDTO.hash));
+                    PublicAccount.createFromPublicKey(lockFundsInfoDTO.lock.account, networkType),
+                    new Mosaic(new MosaicId(lockFundsInfoDTO.lock.mosaicId), new UInt64(lockFundsInfoDTO.lock.amount)),
+                    new UInt64(lockFundsInfoDTO.lock.height),
+                    lockFundsInfoDTO.lock.status,
+                    lockFundsInfoDTO.lock.hash,
+                    lockFundsInfoDTO.meta.id));
             }));
     }
 
@@ -122,15 +129,16 @@ export class LockHttp extends Http {
         return this.getNetworkTypeObservable()
             .flatMap((networkType) => Observable.fromPromise(
                 this.lockRoutesApi.getSecretLocksInfoFromAccount(address.plain(), queryParams != null ? queryParams : {}))
-                .map((LockFundssInfoDTO) => {
-                    return LockFundssInfoDTO.map((secretLockInfoDTO) => new SecretLockInfo(
-                        PublicAccount.createFromPublicKey(secretLockInfoDTO.account, networkType),
-                        new Mosaic(new MosaicId(secretLockInfoDTO.mosaicId), new UInt64(secretLockInfoDTO.amount)),
-                        new UInt64(secretLockInfoDTO.height),
-                        secretLockInfoDTO.status,
-                        secretLockInfoDTO.hashType,
-                        secretLockInfoDTO.secret,
-                        Address.createFromEncoded(secretLockInfoDTO.recipient)))
+                .map((secretLocksInfoDTO) => {
+                    return secretLocksInfoDTO.map((secretLockInfoDTO) => new SecretLockInfo(
+                        PublicAccount.createFromPublicKey(secretLockInfoDTO.lock.account, networkType),
+                        new Mosaic(new MosaicId(secretLockInfoDTO.lock.mosaicId), new UInt64(secretLockInfoDTO.lock.amount)),
+                        new UInt64(secretLockInfoDTO.lock.height),
+                        secretLockInfoDTO.lock.status,
+                        secretLockInfoDTO.lock.hashAlgorithm,
+                        secretLockInfoDTO.lock.secret,
+                        Address.createFromEncoded(secretLockInfoDTO.lock.recipient),
+                        secretLockInfoDTO.meta.id));
                 }));
     }
 }
